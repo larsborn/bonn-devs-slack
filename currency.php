@@ -10,9 +10,14 @@ $exp = explode(' ', $text);
 if (count($exp) == 2) {
     list($amount, $from) = $exp;
     $amount = floatval($amount);
-    $exchange = json_decode(file_get_contents(__DIR__ . '/exchange.json'), $assoc = true);
-    if (isset($exchange['rates'][$from])) {
-        $result = $amount * $exchange['rates'][$from];
+    $exchanges = json_decode(file_get_contents(__DIR__ . '/exchanges/exchange.json'), $assoc = true);
+    $rates = $exchanges['rates'];
+    foreach(['btc', 'etc', 'eth'] as $filename) {
+        $json = json_decode(file_get_contents(__DIR__ . '/exchanges/' . $filename . '.json'), $assoc = true);
+        $rates[$json['ticker']['base']] = 1/floatval($json['ticker']['price']);
+    }
+    if (isset($rates[$from])) {
+        $result = $amount / $rates[$from];
         $message_text = sprintf('%s %s entspricht %s EUR', number_format($amount, 2, ',', '.'), $from, number_format($result, 2, ',', '.'));
     }
     else {
