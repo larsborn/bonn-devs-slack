@@ -1,0 +1,1 @@
+@hourly curl -s 'http://api.fixer.io/latest' > /path/to/exchange.json
